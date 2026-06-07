@@ -115,7 +115,7 @@ function isEndingSoon(seat: Seat): boolean {
         </span>
         <span class="stat-item booked">
           <span class="stat-dot"></span>
-          <span class="stat-label">已约</span>
+          <span class="stat-label">已约未签到</span>
           <span class="stat-value">{{ floorStats.booked }}</span>
         </span>
         <span class="stat-item in-use">
@@ -125,7 +125,7 @@ function isEndingSoon(seat: Seat): boolean {
         </span>
         <span class="stat-item to-clean">
           <span class="stat-dot"></span>
-          <span class="stat-label">待清理</span>
+          <span class="stat-label">已结束待清理</span>
           <span class="stat-value">{{ floorStats.to_clean }}</span>
         </span>
       </div>

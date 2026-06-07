@@ -10,13 +10,27 @@ function formatTimeRemaining(endTimeStr: string): string {
   const endTime = new Date(endTimeStr).getTime();
   const now = Date.now();
   const diff = endTime - now;
-  if (diff <= 0) return "即将结束";
+  if (diff <= 0) return "已结束";
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
   if (hours > 0) return `${hours}小时${mins}分后结束`;
   return `${mins}分钟后结束`;
 }
+
+function formatTimeSince(startTimeStr: string): string {
+  const startTime = new Date(startTimeStr).getTime();
+  const now = Date.now();
+  const diff = now - startTime;
+  if (diff <= 0) return "刚刚";
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  if (hours > 0) return `${hours}小时${mins}分前`;
+  return `${mins}分钟前`;
+}
+
+const CLEANING_DURATION_MINUTES = 15;
 
 function formatTimeShort(timeStr: string): string {
   const date = new Date(timeStr);
@@ -27,7 +41,10 @@ function getNextAvailableTime(seat: Seat): string | undefined {
   if (seat.status === "available") return "现在可用";
   if (seat.currentBooking?.endTime) {
     if (seat.status === "to_clean") {
-      return `清洁中，预计 ${formatTimeShort(generateTime(15))} 可用`;
+      const endTime = new Date(seat.currentBooking.endTime);
+      const availableTime = new Date(endTime.getTime() + CLEANING_DURATION_MINUTES * 60000);
+      const timeSinceEnd = formatTimeSince(seat.currentBooking.endTime);
+      return `清洁中（已结束${timeSinceEnd}），预计 ${formatTimeShort(availableTime.toISOString())} 可用`;
     }
     return `${formatTimeShort(seat.currentBooking.endTime)} 可用（${formatTimeRemaining(seat.currentBooking.endTime)}）`;
   }
@@ -41,7 +58,7 @@ const floor2Seats: Seat[] = [
     currentBooking: { userId: "u001", userName: "张同学", startTime: generateTime(-120), endTime: generateTime(30), checkedIn: true } },
   { id: "2-04", seatNo: "2F-A04", floor: 2, x: 60, y: 240, width: 70, height: 45, type: "window", status: "available" as SeatStatus },
   { id: "2-05", seatNo: "2F-A05", floor: 2, x: 60, y: 300, width: 70, height: 45, type: "window", status: "to_clean" as SeatStatus,
-    currentBooking: { userId: "u002", userName: "李同学", startTime: generateTime(-240), endTime: generateTime(5), checkedIn: true } },
+    currentBooking: { userId: "u002", userName: "李同学", startTime: generateTime(-240), endTime: generateTime(-5), checkedIn: true } },
 
   { id: "2-06", seatNo: "2F-B01", floor: 2, x: 160, y: 60, width: 70, height: 45, type: "power", status: "in_use" as SeatStatus,
     currentBooking: { userId: "u003", userName: "王同学", startTime: generateTime(-90), endTime: generateTime(120), checkedIn: true } },
@@ -57,7 +74,7 @@ const floor2Seats: Seat[] = [
     currentBooking: { userId: "u006", userName: "刘同学", startTime: generateTime(5), endTime: generateTime(125), checkedIn: false } },
   { id: "2-13", seatNo: "2F-C03", floor: 2, x: 260, y: 180, width: 70, height: 45, type: "standard", status: "available" as SeatStatus },
   { id: "2-14", seatNo: "2F-C04", floor: 2, x: 260, y: 240, width: 70, height: 45, type: "standard", status: "to_clean" as SeatStatus,
-    currentBooking: { userId: "u007", userName: "周同学", startTime: generateTime(-180), endTime: generateTime(2), checkedIn: true } },
+    currentBooking: { userId: "u007", userName: "周同学", startTime: generateTime(-180), endTime: generateTime(-8), checkedIn: true } },
   { id: "2-15", seatNo: "2F-C05", floor: 2, x: 260, y: 300, width: 70, height: 45, type: "standard", status: "available" as SeatStatus },
 
   { id: "2-16", seatNo: "2F-D01", floor: 2, x: 360, y: 60, width: 70, height: 45, type: "standard", status: "available" as SeatStatus },
@@ -89,7 +106,7 @@ const floor3Seats: Seat[] = [
   { id: "3-06", seatNo: "3F-B01", floor: 3, x: 160, y: 60, width: 70, height: 45, type: "standard", status: "available" as SeatStatus },
   { id: "3-07", seatNo: "3F-B02", floor: 3, x: 160, y: 120, width: 70, height: 45, type: "standard", status: "available" as SeatStatus },
   { id: "3-08", seatNo: "3F-B03", floor: 3, x: 160, y: 180, width: 70, height: 45, type: "standard", status: "to_clean" as SeatStatus,
-    currentBooking: { userId: "u103", userName: "沈同学", startTime: generateTime(-200), endTime: generateTime(3), checkedIn: true } },
+    currentBooking: { userId: "u103", userName: "沈同学", startTime: generateTime(-200), endTime: generateTime(-10), checkedIn: true } },
   { id: "3-09", seatNo: "3F-B04", floor: 3, x: 160, y: 240, width: 70, height: 45, type: "standard", status: "in_use" as SeatStatus,
     currentBooking: { userId: "u104", userName: "韩同学", startTime: generateTime(-80), endTime: generateTime(100), checkedIn: true } },
   { id: "3-10", seatNo: "3F-B05", floor: 3, x: 160, y: 300, width: 70, height: 45, type: "standard", status: "available" as SeatStatus },
